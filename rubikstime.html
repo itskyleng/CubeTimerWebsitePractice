@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Rubik's Cube Scrambler and Timer</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            padding: 5%;
+        }
+        #scramble, #timer {
+            font-size: 24px;
+            font-weight: bold;
+            margin-top: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h2>Rubik's Cube Scramble Generator</h2>
+    <button onclick="generateScramble()">Generate New Scramble</button>
+    <div id="scramble"></div>
+
+    <h2>Timer</h2>
+    <div id="timer">00:00.000</div>
+
+    <script>
+        function generateScramble(numMoves = 25) {
+            const moves = ["U", "D", "L", "R", "F", "B"];
+            const suffixes = ["", "2", "'"];
+            
+            let lastMove = null;
+            let scramble = [];
+
+            for (let i = 0; i < numMoves; i++) {
+                let move = moves[Math.floor(Math.random() * moves.length)];
+
+                while (move === lastMove || 
+                    (lastMove === "U" && move === "D") || 
+                    (lastMove === "D" && move === "U") || 
+                    (lastMove === "L" && move === "R") || 
+                    (lastMove === "R" && move === "L") || 
+                    (lastMove === "F" && move === "B") || 
+                    (lastMove === "B" && move === "F")) {
+
+                    move = moves[Math.floor(Math.random() * moves.length)];
+                }
+
+                const suffix = suffixes[Math.floor(Math.random() * suffixes.length)];
+                
+                scramble.push(move + suffix);
+                lastMove = move;
+            }
+
+            document.getElementById('scramble').textContent = scramble.join(' ');
+        }
+
+        let timerStarted = false;
+
+        document.addEventListener('keyup', function(event) {
+            if (event.code === 'Space') {
+                if (!timerStarted) {
+                    // Start the timer
+                    startTime = new Date().getTime();
+                    timerInterval = setInterval(updateTimer, 1);  // Update every millisecond
+                    timerStarted = true;
+                } else {
+                    // Stop the timer
+                    clearInterval(timerInterval);
+                    timerStarted = false;
+                }
+            }
+        });
+
+
+
+
+        function updateTimer() {
+            const currentTime = new Date().getTime();
+            const elapsedTime = currentTime - startTime;
+            
+            const minutes = Math.floor(elapsedTime / 60000);
+            const seconds = Math.floor((elapsedTime % 60000) / 1000);
+            const milliseconds = elapsedTime % 1000;
+
+            document.getElementById('timer').textContent = 
+                String(minutes).padStart(2, '0') + ':' + 
+                String(seconds).padStart(2, '0') + '.' + 
+                String(milliseconds).padStart(3, '0');
+        }
+
+        // Generate a scramble when the page loads
+        window.onload = generateScramble;
+
+    </script>
+</body>
+</html>
